@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+  db:
+    image: 'mongo'  
+    restart: always
+    container_name: 'db_container' 
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "crash"
+      MONGO_INITDB_ROOT_PASSWORD: "ramikadaweh"
+      MONGO_INITDB_DATABASE: "customer"
+    expose:
+      - "27017"
+    ports:
+      - "27017:27017"
+    volumes:
+      - db:/data/db 
+  api:
+    build: ./backend
+    container_name: 'node_container'
+    depends_on:
+      - db
+    ports:
+      - '4000:3000' 
+    env_file:
+      - /home/rami/Desktop/AreebaTask/backend/.env    
+  react:
+    build: ./frontend
+    container_name: 'react_container'
+    stdin_open: true
+    ports:
+      - "3000:3000"  
+    environment:
+      - CHOKIDAR_USEPOLLING=true   
+volumes:
+  db: 
