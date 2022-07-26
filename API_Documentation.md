@@ -54,41 +54,31 @@ https://documenter.getpostman.com/view/22235951/UzR1LP2i
 
 ####
 
-## code that are highly efficient
-async AddCustomer(req, res, next) {
-    const phone = req.body.phone;
 
-    const api_key = process.env.REACT_APP_API_KEY;
 
-    const config = {
-      headers: { "X-RapidAPI-Key": api_key },
-    };
-    axios
-      .get(`https://veriphone.p.rapidapi.com/verify?phone=${phone}`, config)
-      .then((response) => {
-        if (response.data.carrier.length === 0) {
-          console.log("invalid number");
-        } else {
-          let numberData = {
-            countryCode: response.data.country_code,
-            countryName: response.data.country,
-            operatorName: response.data.carrier,
-          };
-          const mv = new Customer({
-            name: req.body.name,
-            address: req.body.address,
-            phone,
-          });
-          mv.save({}, (error, result) => {
-            if (error) return next(error);
-            res.send({result, numberData});
-          });
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+## React :
+
+- built using function component
+
+- each function name go with it's action
+
+- fetching data using axios
+
+- MUI used for (edit,delete) button and the Dialog
+
+
+
+## Run the Application
+
+sudo docker-compose up -d
+
+## down the Application
+
+sudo docker-compose down
+
 
 ## parts that should be improved with more time investment
-Create a seperate file for validationNumber API to make the code more clean , I tried it but I faced an issue with async function when I called it inside addCustomer function in controller
+- Create a seperate file for validationNumber API to make the code more clean , I tried it but I faced an issue with async function when I called it inside addCustomer function in controller
+
+- Put more work for the design : I didn't focus on it because it doesn't in requirements
 
