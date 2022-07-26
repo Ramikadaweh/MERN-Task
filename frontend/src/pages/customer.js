@@ -7,43 +7,13 @@ import DialogContent from "@mui/material/DialogContent";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import { styled } from "@mui/material/styles";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
 
 export default function Customer() {
   const [customers, setCustomers] = useState([]);
   const [oneCustomer, setOneCustomer] = useState("");
   const [newCustomer, setNewCustomer] = useState({});
-  console.log("costumer:::", oneCustomer);
 
   const [open, setOpen] = useState(false);
-
-  const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-      backgroundColor: theme.palette.common.black,
-      color: theme.palette.common.white,
-    },
-    [`&.${tableCellClasses.body}`]: {
-      fontSize: 14,
-    },
-  }));
-
-  const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    "&:nth-of-type(odd)": {
-      backgroundColor: theme.palette.action.hover,
-    },
-    // hide last border
-    "&:last-child td, &:last-child th": {
-      border: 0,
-    },
-  }));
 
   const handleClickOpen = (customer) => {
     setOneCustomer(customer);
@@ -75,6 +45,7 @@ export default function Customer() {
           setCustomers([...customers, Response.data.result]);
           setNewCustomer({});
         }
+        console.log(Response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -157,43 +128,24 @@ export default function Customer() {
           add customer
         </Button>
       </form>
-      <TableContainer component={Paper} style={{ boxShadow: "none" }}>
-        <Table
-          sx={{
-            width: "55%",
-            marginLeft: "auto",
-            marginRight: "auto",
-            marginTop: "5%",
-          }}
-          aria-label="customized table"
-        >
-          <TableBody>
-            {customers.map((item, index) => {
-              return (
-                <>
-                  <StyledTableRow key={index}>
-                    <StyledTableCell component="th" scope="row">
-                      {item.name}
-                    </StyledTableCell>
-                    <StyledTableCell align="right">
-                      {item.address}
-                    </StyledTableCell>
-                    <StyledTableCell align="right">
-                      {item.phone}
-                    </StyledTableCell>
-                    <EditIcon onClick={() => handleClickOpen(item)} name="editbtn"/>
-                    <DeleteIcon
-                      style={{ marginTop: "10%", marginLeft: "15%" }}
-                      onClick={() => deleteCustomer(item._id)}
-                      name="dltbtn"
-                    />
-                  </StyledTableRow>
-                </>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      {customers.map((item, index) => {
+        return (
+            <div
+              key={index}
+              style={{ display: "flex", gap: "5%", justifyContent:"center" }}
+            >
+              <p>{item.name}</p>
+              <p>{item.address}</p>
+              <p>{item.phone}</p>
+              <Button onClick={() => handleClickOpen(item)} name="editbtn">
+                edit
+              </Button>
+              <Button onClick={() => deleteCustomer(item._id)} name="dltbtn">
+                delete
+              </Button>
+            </div>
+        );
+      })}
       <Dialog open={open} onClose={handleClose}>
         <DialogContent>
           <TextField
