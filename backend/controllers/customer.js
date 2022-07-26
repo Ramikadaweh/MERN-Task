@@ -1,5 +1,4 @@
 const Customer = require("../models/customer");
-const validation = require("./validation");
 const axios = require("axios");
 require("dotenv").config();
 
@@ -28,14 +27,12 @@ class Controller {
     axios
       .get(`https://veriphone.p.rapidapi.com/verify?phone=${phone}`, config)
       .then((response) => {
-        if (response.data.carrier.length === 0) {
-          console.log("invalid number");
-        } else {
+       
           let numberData = {
             countryCode: response.data.country_code,
             countryName: response.data.country,
             operatorName: response.data.carrier,
-          };
+          };if(response.data.carrier===""){numberData={errorNumber:'invalid number'}}
           const mv = new Customer({
             name: req.body.name,
             address: req.body.address,
@@ -45,7 +42,7 @@ class Controller {
             if (error) return next(error);
             res.send({result, numberData});
           });
-        }
+        
       })
       .catch((error) => {
         console.log(error);
