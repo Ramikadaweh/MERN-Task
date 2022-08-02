@@ -1,12 +1,15 @@
-import { useEffect, useState, React } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-
+import * as React from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
+import Snackbar from "@mui/material/Snackbar";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
 
 export default function Customer() {
   const [customers, setCustomers] = useState([]);
@@ -14,6 +17,9 @@ export default function Customer() {
   const [newCustomer, setNewCustomer] = useState({});
 
   const [open, setOpen] = useState(false);
+  const [opens, setOpens] = useState(false);
+
+  const messageInfo = "Invalid Number !";
 
   const handleClickOpen = (customer) => {
     setOneCustomer(customer);
@@ -22,6 +28,7 @@ export default function Customer() {
 
   const handleClose = () => {
     setOpen(false);
+    setOpens(false);
   };
 
   function getCustomers() {
@@ -41,11 +48,14 @@ export default function Customer() {
     axios
       .post("http://localhost:4000/customers/", newCustomer)
       .then((Response) => {
-        if (Response.status === 200) {
-          setCustomers([...customers, Response.data.result]);
+        if (Response.data.success === true) {
+          console.log(Response.data);
+          setCustomers([...customers, Response.data.response]);
           setNewCustomer({});
         }
-        console.log(Response.data);
+        if (Response.data.success === false) {
+          setOpens(true);
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -56,7 +66,6 @@ export default function Customer() {
     axios
       .delete(`http://localhost:4000/customers/${_id}`)
       .then((Response) => {
-        console.log(Response);
         getCustomers();
       })
       .catch((error) => {
@@ -68,8 +77,13 @@ export default function Customer() {
     axios
       .put(`http://localhost:4000/customers/${_id}`, oneCustomer)
       .then((Response) => {
-        console.log(Response);
-        getCustomers();
+        if (Response.data.success === true) {
+          console.log(Response.data);
+          getCustomers();
+        }
+        if (Response.data.success === false) {
+          setOpens(true);
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -130,20 +144,20 @@ export default function Customer() {
       </form>
       {customers.map((item, index) => {
         return (
-            <div
-              key={index}
-              style={{ display: "flex", gap: "5%", justifyContent:"center" }}
-            >
-              <p>{item.name}</p>
-              <p>{item.address}</p>
-              <p>{item.phone}</p>
-              <Button onClick={() => handleClickOpen(item)} name="editbtn">
-                edit
-              </Button>
-              <Button onClick={() => deleteCustomer(item._id)} name="dltbtn">
-                delete
-              </Button>
-            </div>
+          <div
+            key={index}
+            style={{ display: "flex", gap: "5%", justifyContent: "center" }}
+          >
+            <p>{item.name}</p>
+            <p>{item.address}</p>
+            <p>{item.phone}</p>
+            <Button onClick={() => handleClickOpen(item)} name="editbtn">
+              edit
+            </Button>
+            <Button onClick={() => deleteCustomer(item._id)} name="dltbtn">
+              delete
+            </Button>
+          </div>
         );
       })}
       <Dialog open={open} onClose={handleClose}>
@@ -182,6 +196,25 @@ export default function Customer() {
           </Button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        style={{ top: "5%", position: "absolute", left: "38%", height: "70px" }}
+        open={opens}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        message={messageInfo}
+        action={
+          <React.Fragment>
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              sx={{ p: 1.5 }}
+              onClick={handleClose}
+            >
+              <CloseIcon />
+            </IconButton>
+          </React.Fragment>
+        }
+      />
     </div>
   );
 }
